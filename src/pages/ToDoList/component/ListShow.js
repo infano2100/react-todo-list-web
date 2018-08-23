@@ -2,10 +2,21 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import moment from 'moment'
-import { Button, Icon, Popconfirm, message, Modal, Table, Checkbox } from 'antd'
+import {
+  Button,
+  Icon,
+  Popconfirm,
+  message,
+  Modal,
+  Table,
+  Checkbox,
+  Tabs
+} from 'antd'
 
 import FormAdd from './FormAdd'
 import { addTodo, delTodo, editTodo, changeStatusTodo } from '../../../actions/'
+
+const TabPane = Tabs.TabPane
 
 export class ListShow extends Component {
   constructor(props) {
@@ -122,7 +133,7 @@ export class ListShow extends Component {
     ]
 
     const { dataToDo } = this.state
-    const { list } = this.props
+    const { list, list_completed } = this.props
     return (
       <div style={{ textAlign: 'center' }}>
         <h1 style={{ marginBottom: 16 }}>ToDo List</h1>
@@ -131,21 +142,45 @@ export class ListShow extends Component {
             ADD
           </Button>
         </div>
-        <Table
-          // rowSelection={rowSelection}
-          columns={columns}
-          expandedRowRender={record => (
-            <div>
-              <p style={{ margin: 0 }}>ID : {record.id}</p>
-              <p style={{ margin: 0 }}>Description : {record.description}</p>
-              <p style={{ margin: 0 }}>
-                Date : {moment(record.createdAt).format('LLL')}
-              </p>
-            </div>
-          )}
-          dataSource={list}
-          rowKey={record => record.id}
-        />
+
+        <Tabs defaultActiveKey="1">
+          <TabPane tab="ToDo List" key="1">
+            <Table
+              columns={columns}
+              expandedRowRender={record => (
+                <div>
+                  <p style={{ margin: 0 }}>ID : {record.id}</p>
+                  <p style={{ margin: 0 }}>
+                    Description : {record.description}
+                  </p>
+                  <p style={{ margin: 0 }}>
+                    Date : {moment(record.createdAt).format('LLL')}
+                  </p>
+                </div>
+              )}
+              dataSource={list}
+              rowKey={record => record.id}
+            />
+          </TabPane>
+          <TabPane tab="Completed" key="2">
+            <Table
+              columns={columns}
+              expandedRowRender={record => (
+                <div>
+                  <p style={{ margin: 0 }}>ID : {record.id}</p>
+                  <p style={{ margin: 0 }}>
+                    Description : {record.description}
+                  </p>
+                  <p style={{ margin: 0 }}>
+                    Date : {moment(record.createdAt).format('LLL')}
+                  </p>
+                </div>
+              )}
+              dataSource={list_completed}
+              rowKey={record => record.id}
+            />
+          </TabPane>
+        </Tabs>
 
         <Modal
           title={
@@ -182,8 +217,16 @@ const styles = {
 }
 
 const mapStateToProps = state => {
+  const dataCompleted = []
+  state.data.map(function(val) {
+    if (val.completed === true) {
+      dataCompleted.push(val)
+    }
+  })
+
   return {
-    list: state.data
+    list: state.data,
+    list_completed: dataCompleted
   }
 }
 
